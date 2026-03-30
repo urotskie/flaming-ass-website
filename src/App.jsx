@@ -62,6 +62,28 @@ export default function SmallBusinessEcommerceWebsite() {
     });
   };
 
+  const increaseQuantity = (productId) => {
+    setCartItems((current) =>
+      current.map((item) =>
+        item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
+      )
+    );
+  };
+
+  const decreaseQuantity = (productId) => {
+    setCartItems((current) =>
+      current
+        .map((item) =>
+          item.id === productId ? { ...item, quantity: item.quantity - 1 } : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
+  };
+
+  const removeFromCart = (productId) => {
+    setCartItems((current) => current.filter((item) => item.id !== productId));
+  };
+
   const totalCartItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const totalCartPrice = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -207,19 +229,103 @@ export default function SmallBusinessEcommerceWebsite() {
                 cartItems.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center justify-between rounded-xl border border-orange-500/20 bg-zinc-950 px-4 py-3"
+                    className="rounded-xl border border-orange-500/20 bg-zinc-950 px-4 py-4"
                   >
-                    <div>
-                      <p className="font-semibold">{item.name}</p>
-                      <p className="text-sm text-zinc-400">{item.category}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm text-zinc-400">Qty: {item.quantity}</p>
-                      <p className="font-bold">₱{item.price * item.quantity}</p>
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="font-semibold">{item.name}</p>
+                        <p className="text-sm text-zinc-400">{item.category}</p>
+                        <p className="mt-1 text-sm text-zinc-400">₱{item.price} each</p>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-3">
+                        <div className="flex items-center overflow-hidden rounded-xl border border-orange-500/20">
+                          <button
+                            onClick={() => decreaseQuantity(item.id)}
+                            className="px-3 py-2 text-lg font-bold text-white hover:bg-zinc-900"
+                          >
+                            −
+                          </button>
+                          <span className="min-w-[48px] px-3 py-2 text-center font-semibold">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() => increaseQuantity(item.id)}
+                            className="px-3 py-2 text-lg font-bold text-white hover:bg-zinc-900"
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        <div className="min-w-[90px] text-right">
+                          <p className="font-bold">₱{item.price * item.quantity}</p>
+                        </div>
+
+                        <button
+                          onClick={() => removeFromCart(item.id)}
+                          className="rounded-xl border border-red-500/30 px-3 py-2 text-sm font-semibold text-red-300 hover:bg-red-500/10"
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))
               )}
+            </div>
+
+            <div className="mt-6 rounded-[1.5rem] border border-orange-500/20 bg-zinc-950 p-5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h5 className="text-lg font-bold">Checkout Options</h5>
+                  <p className="text-sm text-zinc-400">
+                    Simple local checkout for direct orders.
+                  </p>
+                </div>
+                <div className="text-left sm:text-right">
+                  <p className="text-sm text-zinc-400">Amount Due</p>
+                  <p className="text-2xl font-black">₱{totalCartPrice}</p>
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-4 md:grid-cols-3">
+                <div className="rounded-xl border border-orange-500/20 bg-zinc-900 p-4">
+                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-300">GCash</p>
+                  <p className="mt-2 font-semibold">09XX-XXX-XXXX</p>
+                  <p className="mt-1 text-sm text-zinc-400">Account Name: UROTSKIE</p>
+                  <p className="mt-3 text-sm text-zinc-300">
+                    Send payment, then message your proof of payment with your order details.
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-orange-500/20 bg-zinc-900 p-4">
+                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-300">Cash on Delivery</p>
+                  <p className="mt-2 text-sm text-zinc-300">
+                    Available for selected delivery areas. Final confirmation depends on location and rider availability.
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-orange-500/20 bg-zinc-900 p-4">
+                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-300">Direct Message</p>
+                  <p className="mt-2 text-sm text-zinc-300">
+                    Best for fast ordering. Send your selected items, quantity, full name, address, and preferred payment method.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-5 flex flex-wrap gap-3">
+                <a
+                  href="https://m.me/flamingassbyurotskie"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-2xl bg-orange-600 px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
+                >
+                  Message to Order
+                </a>
+                <button className="rounded-2xl border border-orange-500/20 px-5 py-3 text-sm font-semibold text-zinc-100 hover:bg-zinc-900">
+                  View GCash Details
+                </button>
+              </div>
             </div>
           </div>
         </section>
