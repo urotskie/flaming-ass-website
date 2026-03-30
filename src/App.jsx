@@ -63,7 +63,7 @@ export default function SmallBusinessEcommerceWebsite() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <div>
             <div className="flex items-center gap-3">
-  <img src={logo} className="h-10 w-10 rounded-full" />
+  <img src={logo} className="absolute right-5 bottom-5 w-24 opacity-20" />
   <h1 className="text-xl font-black tracking-tight sm:text-2xl">
     FLAMING ASS
   </h1>
