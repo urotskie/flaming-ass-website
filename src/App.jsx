@@ -2,39 +2,39 @@ export default function SmallBusinessEcommerceWebsite() {
   const products = [
     {
       id: 1,
-      name: "Hotsauce 1",
-      category: "Original Heat",
+      name: "Flaming Ass Carolina Repear Hotsauce",
+      category: "HELLBREAKER",
       price: "₱350",
       image:
         "https://images.unsplash.com/photo-1472476443507-c7a5948772fc?auto=format&fit=crop&w=900&q=80",
-      description: "Editable product card for your first hot sauce variant. Change the flavor profile, heat level, and bottle image.",
+      description: "Maximum pain. This isn’t food—it’s a challenge. One drop and your soul leaves your body. Only for hardcore chili heads.",
     },
     {
       id: 2,
-      name: "Hotsauce 2",
-      category: "Garlic Fire",
-      price: "₱400",
+      name: "Flaming Ass Habanero Hotsauce",
+      category: "INFERNO",
+      price: "₱350",
       image:
         "https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=900&q=80",
-      description: "Use this for a second variant with a richer or more savory kick.",
+      description: "Blazing heat that builds and doesn’t stop. Tears, sweat, and regret guaranteed.",
     },
     {
       id: 3,
-      name: "Hotsauce 3",
-      category: "Smoky Burn",
-      price: "₱450",
+      name: "Flaming Ass Pineapple Habanero Hotsauce",
+      category: "BLAZING HOT",
+      price: "₱350",
       image:
         "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=80",
-      description: "Perfect for a smoky or extra spicy edition. Price is fully editable.",
+      description: "Strong kick with a steady burn. Hot enough to feel, but still enjoyable.",
     },
     {
       id: 4,
-      name: "Hotsauce 4",
-      category: "Extreme Heat",
-      price: "₱500",
+      name: "Flaming Ass Green Jalapeño Hotsauce",
+      category: "MILD",
+      price: "₱300",
       image:
         "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80",
-      description: "Your premium hot sauce variant for customers who want the strongest flavor and heat.",
+      description: "Very light heat. Focus on flavor with just a hint of spice.",
     },
   ];
 
