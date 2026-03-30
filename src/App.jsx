@@ -1,3 +1,5 @@
+import logo from "./assets/logo.png";
+import banner from "./assets/banner.png";
 export default function SmallBusinessEcommerceWebsite() {
   const products = [
     {
@@ -60,8 +62,13 @@ export default function SmallBusinessEcommerceWebsite() {
       <header className="sticky top-0 z-50 border-b border-orange-500/20 bg-zinc-950/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <div>
-            <h1 className="text-xl font-black tracking-tight sm:text-2xl">FLAMING ASS BY UROTSKIE</h1>
-            <p className="text-xs text-zinc-400 sm:text-sm">Hot sauce small business website</p>
+            <div className="flex items-center gap-3">
+  <img src={logo} className="h-10 w-10 rounded-full" />
+  <h1 className="text-xl font-black tracking-tight sm:text-2xl">
+    FLAMING ASS
+  </h1>
+</div>
+            <p className="text-xs text-zinc-400 sm:text-sm">Flavor up front. Fire in the backdoor.</p>
           </div>
 
           <nav className="hidden items-center gap-6 md:flex">
@@ -125,10 +132,10 @@ export default function SmallBusinessEcommerceWebsite() {
             <div className="relative">
               <div className="rounded-[2rem] border border-orange-500/20 bg-zinc-900 p-4 shadow-2xl relative overflow-hidden before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_bottom,rgba(251,146,60,0.18),transparent_45%)] before:pointer-events-none">
                 <img
-                  src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1200&q=80"
-                  alt="Online store hero"
-                  className="h-[420px] w-full rounded-[1.5rem] object-cover"
-                />
+  src={banner}
+  alt="Flaming Ass Hot Sauce"
+  className="h-[420px] w-full rounded-[1.5rem] object-cover"
+/>
               </div>
               <div className="absolute -bottom-6 -left-3 rounded-3xl border border-orange-500/20 bg-zinc-900/95 p-4 shadow-xl sm:left-6">
                 <p className="text-xs uppercase tracking-[0.2em] text-zinc-400">Featured</p>
