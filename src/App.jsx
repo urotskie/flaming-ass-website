@@ -299,9 +299,9 @@ export default function SmallBusinessEcommerceWebsite() {
                 </div>
 
                 <div className="rounded-xl border border-orange-500/20 bg-zinc-900 p-4">
-                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-300">Cash on Delivery</p>
+                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-300">Bank Transfer</p>
                   <p className="mt-2 text-sm text-zinc-300">
-                    Available for selected delivery areas. Final confirmation depends on location and rider availability.
+                    Under construction. Will be available soon.
                   </p>
                 </div>
 
