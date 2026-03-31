@@ -15,7 +15,7 @@ export default function SmallBusinessEcommerceWebsite() {
   const gcashNumber = "09178833790";
   const gcashName = "Arthur Cedric Michael Jacob P. Caballes";
   const messengerLink =
-    "https://m.me/flamingassbyurotskie";
+  "https://m.me/flamingassbyurotskie";
 
   const products = [
     {
