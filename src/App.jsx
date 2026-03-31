@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import logo from "./assets/logo.png";
 import banner from "./assets/banner.png";
+import carolina from "./assets/carolina.png";
+import habanero from "./assets/habanero.png";
+import pineapple from "./assets/pineapple.png";
+import jalapeno from "./assets/jalapeno.png";
 
 export default function SmallBusinessEcommerceWebsite() {
   const [cartItems, setCartItems] = useState([]);
@@ -12,16 +16,12 @@ export default function SmallBusinessEcommerceWebsite() {
   const [notes, setNotes] = useState("");
   const [showPaymentDetails, setShowPaymentDetails] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [feedbackRating, setFeedbackRating] = useState("⭐⭐⭐⭐⭐ Excellent");
+  const [feedbackText, setFeedbackText] = useState("");
 
   const gcashNumber = "09178833790";
   const gcashName = "Arthur Cedric Michael Jacob P. Caballes";
   const pageLink = "https://www.facebook.com/flamingassbyurotskie";
-
-  const deliveryRates = [
-    { area: "Cebu City", fee: 50 },
-    { area: "Mandaue / Lapu-Lapu", fee: 80 },
-    { area: "Outside Metro Cebu", fee: 120 },
-  ];
 
   const products = [
     {
@@ -31,8 +31,7 @@ export default function SmallBusinessEcommerceWebsite() {
       price: 350,
       badge: "BEST SELLER",
       heat: "EXTREME",
-      image:
-        "https://images.unsplash.com/photo-1472476443507-c7a5948772fc?auto=format&fit=crop&w=900&q=80",
+      image: carolina,
       description:
         "Pure punishment in a bottle. Made with Carolina Reaper, this hits instantly and lingers brutally. Not for casual eaters—this is for those who crave real heat.",
     },
@@ -43,34 +42,31 @@ export default function SmallBusinessEcommerceWebsite() {
       price: 350,
       badge: "HOT PICK",
       heat: "HOT",
-      image:
-        "https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=900&q=80",
+      image: habanero,
       description:
         "A fiery classic. Strong habanero punch with a smooth burn that keeps building. Perfect balance of flavor and heat that hits hard but stays enjoyable.",
     },
     {
       id: 3,
-      name: "Flaming Ass Pineapple Habanero",
+      name: "Flaming Ass Pineapple & Habanero Hot Sauce",
       category: "BLAZING HOT",
       price: 350,
       badge: "LIMITED STOCK",
       heat: "MEDIUM-HOT",
-      image:
-        "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=80",
+      image: pineapple,
       description:
         "Sweet meets savage. Tropical pineapple upfront, then a creeping habanero burn kicks in. A perfect mix of flavor and fire for everyday use.",
     },
     {
       id: 4,
-      name: "Flaming Ass Green Jalapeño",
+      name: "Flaming Ass Creamy Jalapeño",
       category: "MILD",
       price: 300,
       badge: "EASY START",
       heat: "MILD",
-      image:
-        "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80",
+      image: jalapeno,
       description:
-        "Fresh, zesty, and easygoing. Light jalapeño heat with strong flavor—great for dipping, marinating, or daily meals without overwhelming spice.",
+        "Fresh, creamy, zesty, and easygoing. Light jalapeño heat with strong flavor—great for dipping, marinating, or daily meals without overwhelming spice.",
     },
   ];
 
@@ -170,17 +166,10 @@ export default function SmallBusinessEcommerceWebsite() {
     [cartItems]
   );
 
-  const subtotal = useMemo(
+  const totalCartPrice = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
     [cartItems]
   );
-
-  const bundleDiscount = useMemo(() => {
-    const qualifyingBundles = Math.floor(totalCartItems / 3);
-    return qualifyingBundles * 150;
-  }, [totalCartItems]);
-
-  const totalCartPrice = useMemo(() => subtotal - bundleDiscount, [subtotal, bundleDiscount]);
 
   const orderId = useMemo(() => {
     const now = new Date();
@@ -197,19 +186,30 @@ export default function SmallBusinessEcommerceWebsite() {
 
     return cartItems
       .map(
-        (item) =>
-          `${item.quantity}x ${item.name} - ₱${item.price * item.quantity}`
+        (item) => `${item.quantity}x ${item.name} - ₱${item.price * item.quantity}`
       )
       .join("\n");
   }, [cartItems]);
 
   const orderMessage = useMemo(() => {
-    return `🔥 FLAMING ASS ORDER 🔥\n\nOrder ID: ${orderId}\n\nItems:\n${orderSummary}\n\nSubtotal: ₱${subtotal}\nBundle Discount: ₱${bundleDiscount}\nTotal: ₱${totalCartPrice}\n\nCustomer Name: ${customerName || "-"}\nContact Number: ${contactNumber || "-"}\nAddress: ${address || "-"}\nPayment Method: ${paymentMethod}\nReference Number: ${referenceNumber || "-"}\nNotes: ${notes || "-"}`;
+    return `🔥 FLAMING ASS ORDER 🔥
+
+Order ID: ${orderId}
+
+Items:
+${orderSummary}
+
+Total: ₱${totalCartPrice}
+
+Customer Name: ${customerName || "-"}
+Contact Number: ${contactNumber || "-"}
+Address: ${address || "-"}
+Payment Method: ${paymentMethod}
+Reference Number: ${referenceNumber || "-"}
+Notes: ${notes || "-"}`;
   }, [
     orderId,
     orderSummary,
-    subtotal,
-    bundleDiscount,
     totalCartPrice,
     customerName,
     contactNumber,
@@ -253,6 +253,24 @@ export default function SmallBusinessEcommerceWebsite() {
     window.open(pageLink, "_blank");
   };
 
+  const submitFeedback = () => {
+    const message = `🔥 FLAMING ASS FEEDBACK 🔥
+
+Rating: ${feedbackRating}
+Feedback: ${feedbackText || "-"}`;
+
+    navigator.clipboard
+      .writeText(message)
+      .then(() => {
+        alert("Feedback copied. The Facebook Page will open next. Click Message and paste your feedback.");
+        window.open(pageLink, "_blank");
+      })
+      .catch(() => {
+        alert("Please copy your feedback manually and send it through the Facebook Page.");
+        window.open(pageLink, "_blank");
+      });
+  };
+
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <header className="sticky top-0 z-50 border-b border-orange-500/20 bg-zinc-950/90 backdrop-blur">
@@ -290,6 +308,7 @@ export default function SmallBusinessEcommerceWebsite() {
               <span className="mb-4 inline-flex w-fit rounded-full border border-orange-500/20 bg-zinc-900 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-orange-300">
                 Small-batch heat for real spice lovers
               </span>
+
               <h2 className="max-w-xl text-4xl font-black sm:text-5xl lg:text-6xl">
                 Real Heat. Real Flavor.
               </h2>
@@ -323,12 +342,12 @@ export default function SmallBusinessEcommerceWebsite() {
                   <p className="text-sm text-zinc-400">Flavor Variants</p>
                 </div>
                 <div className="rounded-2xl border border-orange-500/20 bg-zinc-900 p-4">
-                  <p className="text-2xl font-black">₱150</p>
-                  <p className="text-sm text-zinc-400">Bundle Savings</p>
-                </div>
-                <div className="rounded-2xl border border-orange-500/20 bg-zinc-900 p-4">
                   <p className="text-2xl font-black">GCash</p>
                   <p className="text-sm text-zinc-400">Fast Payment</p>
+                </div>
+                <div className="rounded-2xl border border-orange-500/20 bg-zinc-900 p-4">
+                  <p className="text-2xl font-black">Direct</p>
+                  <p className="text-sm text-zinc-400">Page Ordering</p>
                 </div>
               </div>
             </div>
@@ -350,36 +369,22 @@ export default function SmallBusinessEcommerceWebsite() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-4 pb-4">
+        <section className="mx-auto max-w-7xl px-4 pb-6">
           <div className="rounded-[2rem] border border-orange-500/20 bg-zinc-900 p-6">
-            <div className="grid gap-4 md:grid-cols-3">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-300">
-                  Bundle Promo
-                </p>
-                <h3 className="mt-2 text-2xl font-black">Any 3 Bottles = Save ₱150</h3>
-                <p className="mt-2 text-sm text-zinc-400">
-                  Discount is applied automatically in the cart.
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-300">
-                  Delivery
-                </p>
-                <div className="mt-2 space-y-1 text-sm text-zinc-300">
-                  {deliveryRates.map((rate) => (
-                    <p key={rate.area}>{rate.area} — ₱{rate.fee}</p>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-300">
-                  Processing Time
-                </p>
-                <p className="mt-2 text-sm text-zinc-300">
-                  Same day or next day confirmation depending on order volume and delivery area.
-                </p>
-              </div>
+            <h3 className="text-2xl font-black">Contact Information</h3>
+
+            <div className="mt-4 space-y-2 text-sm text-zinc-300">
+              <p>
+                <span className="font-semibold">Contact Number:</span> 09178833790
+              </p>
+              <p>
+                <span className="font-semibold">Facebook:</span>{" "}
+                www.facebook.com/flamingassbyurotskie
+              </p>
+              <p>
+                <span className="font-semibold">Location:</span> St. Anthony's Village
+                Hiway-77 Talamban Cebu City
+              </p>
             </div>
           </div>
         </section>
@@ -407,7 +412,7 @@ export default function SmallBusinessEcommerceWebsite() {
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="h-64 w-full rounded-xl object-cover"
+                      className="h-64 w-full rounded-xl object-contain bg-white"
                     />
                     <span className="absolute left-3 top-3 rounded-full bg-zinc-950/90 px-3 py-1 text-[10px] font-semibold tracking-[0.2em] text-orange-300">
                       {product.badge}
@@ -419,7 +424,9 @@ export default function SmallBusinessEcommerceWebsite() {
                       <p className="text-sm tracking-[0.2em] text-orange-300">
                         {product.category}
                       </p>
-                      <p className="mt-1 text-xs text-zinc-500">Heat Level: {product.heat}</p>
+                      <p className="mt-1 text-xs text-zinc-500">
+                        Heat Level: {product.heat}
+                      </p>
                     </div>
                     <p className="text-lg font-black">₱{product.price}</p>
                   </div>
@@ -452,7 +459,7 @@ export default function SmallBusinessEcommerceWebsite() {
               },
               {
                 title: "GCash Ready",
-                text: "Customers can pay instantly through GCash and send the reference number with the order.",
+                text: "Customers can pay instantly through GCash and send the reference number plus screenshot after payment.",
               },
               {
                 title: "Built for Mobile",
@@ -472,31 +479,70 @@ export default function SmallBusinessEcommerceWebsite() {
 
         <section className="mx-auto max-w-7xl px-4 pb-10">
           <div className="rounded-[2rem] border border-orange-500/20 bg-zinc-900 p-6">
-            <h3 className="text-2xl font-black">What Customers Say</h3>
-            <div className="mt-5 grid gap-4 md:grid-cols-3">
-              {[
-                {
-                  name: "Cebu Customer",
-                  text: "Grabe ka anghang pero lami kaayo. The Pineapple Habanero is my favorite. 🔥",
-                },
-                {
-                  name: "Spice Lover",
-                  text: "The Carolina Reaper is no joke. Clean flavor first, then pure pain after.",
-                },
-                {
-                  name: "Repeat Buyer",
-                  text: "Minimal but smooth ordering process. Easy to message and order directly.",
-                },
-              ].map((review) => (
-                <div
-                  key={review.name}
-                  className="rounded-[1.5rem] border border-orange-500/20 bg-zinc-950 p-5"
-                >
-                  <p className="text-orange-300">★★★★★</p>
-                  <p className="mt-3 text-sm text-zinc-300">“{review.text}”</p>
-                  <p className="mt-4 text-sm font-semibold text-zinc-400">— {review.name}</p>
+            <h3 className="text-2xl font-black">Customer Feedback</h3>
+
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              <div className="space-y-4">
+                <div className="rounded-xl bg-zinc-950 p-4">
+                  <p className="text-orange-300">⭐⭐⭐⭐⭐</p>
+                  <p className="mt-2 text-sm text-zinc-300">
+                    “Grabe ka anghang pero lami kaayo 🔥”
+                  </p>
+                  <p className="text-xs text-zinc-500">– Cebu Customer</p>
                 </div>
-              ))}
+
+                <div className="rounded-xl bg-zinc-950 p-4">
+                  <p className="text-orange-300">⭐⭐⭐⭐⭐</p>
+                  <p className="mt-2 text-sm text-zinc-300">
+                    “Legit spicy. Di siya fake heat.”
+                  </p>
+                  <p className="text-xs text-zinc-500">– Repeat Buyer</p>
+                </div>
+
+                <div className="rounded-xl bg-zinc-950 p-4">
+                  <p className="text-orange-300">⭐⭐⭐⭐⭐</p>
+                  <p className="mt-2 text-sm text-zinc-300">
+                    “Minimal but smooth ordering process. Easy to message and order directly.”
+                  </p>
+                  <p className="text-xs text-zinc-500">– Online Buyer</p>
+                </div>
+              </div>
+
+              <div className="rounded-xl bg-zinc-950 p-5">
+                <h4 className="font-bold">Rate Your Experience</h4>
+
+                <div className="mt-4 space-y-3">
+                  <select
+                    value={feedbackRating}
+                    onChange={(e) => setFeedbackRating(e.target.value)}
+                    className="w-full rounded-xl border border-orange-500/20 bg-zinc-900 p-3 outline-none"
+                  >
+                    <option>⭐⭐⭐⭐⭐ Excellent</option>
+                    <option>⭐⭐⭐⭐ Good</option>
+                    <option>⭐⭐⭐ Okay</option>
+                    <option>⭐⭐ Needs Improvement</option>
+                  </select>
+
+                  <textarea
+                    value={feedbackText}
+                    onChange={(e) => setFeedbackText(e.target.value)}
+                    placeholder="Your feedback..."
+                    className="w-full rounded-xl border border-orange-500/20 bg-zinc-900 p-3 outline-none"
+                    rows={5}
+                  />
+
+                  <button
+                    onClick={submitFeedback}
+                    className="w-full rounded-xl bg-orange-600 py-3 font-semibold"
+                  >
+                    Submit Feedback
+                  </button>
+                </div>
+
+                <p className="mt-3 text-xs text-zinc-500">
+                  Feedback will be copied, then your Facebook Page will open so the buyer can paste and send it.
+                </p>
+              </div>
             </div>
           </div>
         </section>
@@ -513,8 +559,6 @@ export default function SmallBusinessEcommerceWebsite() {
               </div>
               <div className="text-left sm:text-right">
                 <p className="text-sm text-zinc-400">Items: {totalCartItems}</p>
-                <p className="text-lg text-zinc-400">Subtotal: ₱{subtotal}</p>
-                <p className="text-lg text-orange-300">Bundle Discount: ₱{bundleDiscount}</p>
                 <p className="text-2xl font-black">Total: ₱{totalCartPrice}</p>
               </div>
             </div>
@@ -614,7 +658,9 @@ export default function SmallBusinessEcommerceWebsite() {
                         Account Name: {gcashName}
                       </p>
                       <p className="mt-3 text-sm text-zinc-300">
-                        Send payment first, then place your reference number in the form before sending your order.
+                        Send payment via GCash, then:
+                        <br />• Enter your reference number
+                        <br />• Upload/send screenshot in Messenger after checkout
                       </p>
                     </div>
 
@@ -670,14 +716,14 @@ export default function SmallBusinessEcommerceWebsite() {
                     type="text"
                     value={referenceNumber}
                     onChange={(e) => setReferenceNumber(e.target.value)}
-                    placeholder="Reference Number / Last 4 Digits"
+                    placeholder="Reference Number"
                     className="w-full rounded-2xl border border-orange-400/30 bg-zinc-900 px-4 py-3 outline-none transition focus:border-orange-400"
                   />
                   <textarea
                     rows={3}
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Notes (optional)"
+                    placeholder="Notes / mention that you will send screenshot"
                     className="w-full rounded-2xl border border-orange-400/30 bg-zinc-900 px-4 py-3 outline-none transition focus:border-orange-400"
                   />
                 </div>
