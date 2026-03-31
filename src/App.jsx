@@ -230,64 +230,52 @@ Notes: ${notes || "-"}`;
   };
 
   const handleMessengerCheckout = async () => {
-  if (cartItems.length === 0) {
-    alert("Your cart is empty.");
-    return;
-  }
-
-  if (!customerName || !contactNumber || !address) {
-    alert("Please fill in your name, contact number, and address first.");
-    return;
-  }
-
-  const orderPayload = {
-    order_id: orderId,
-    customer_name: customerName,
-    contact_number: contactNumber,
-    address: address,
-    payment_method: paymentMethod,
-    reference_number: referenceNumber || null,
-    notes: notes || null,
-    items: cartItems,
-    total_amount: totalCartPrice,
-    status: "pending",
-  };
-
-  const { error } = await supabase.from("orders").insert(orderPayload);
-
-  if (error) {
-    alert("Order saving failed. Please try again.");
-    console.error(error);
-    return;
-  }
-
-  try {
-    await navigator.clipboard.writeText(orderMessage);
-    alert(
-      "Order saved successfully. Facebook Page will open next. Click Message and paste your order."
-    );
-  } catch {
-    alert(
-      "Order saved successfully. Facebook Page will open next, but you may need to copy the order preview manually."
-    );
-  }
-
-  window.open(pageLink, "_blank");
-};
+    if (cartItems.length === 0) {
+      alert("Your cart is empty.");
+      return;
+    }
 
     if (!customerName || !contactNumber || !address) {
       alert("Please fill in your name, contact number, and address first.");
       return;
     }
 
+    const orderPayload = {
+      order_id: orderId,
+      customer_name: customerName,
+      contact_number: contactNumber,
+      address: address,
+      payment_method: paymentMethod,
+      reference_number: referenceNumber || null,
+      notes: notes || null,
+      items: cartItems,
+      total_amount: totalCartPrice,
+      status: "pending",
+    };
+
+    console.log("Saving order:", orderPayload);
+
+    const { data, error } = await supabase
+      .from("orders")
+      .insert([orderPayload])
+      .select();
+
+    console.log("Supabase response:", { data, error });
+
+    if (error) {
+      alert("Order saving failed: " + error.message);
+      console.error(error);
+      return;
+    }
+
     try {
       await navigator.clipboard.writeText(orderMessage);
       alert(
-        "Order details copied. Facebook Page will open next. Click Message and paste your order."
+        "Order saved successfully. Facebook Page will open next. Click Message and paste your order."
       );
     } catch {
       alert(
-        "Copy failed. Facebook Page will open, but you may need to copy the order preview manually."
+        "Order saved successfully. Facebook Page will open next, but you may need to copy the order preview manually."
       );
     }
 
@@ -845,3 +833,4 @@ Feedback: ${feedbackText || "-"}`;
     </div>
   );
 }
+
