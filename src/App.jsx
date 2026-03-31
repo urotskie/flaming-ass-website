@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import logo from "./assets/logo.png";
 import banner from "./assets/banner.png";
 
@@ -11,10 +11,17 @@ export default function SmallBusinessEcommerceWebsite() {
   const [referenceNumber, setReferenceNumber] = useState("");
   const [notes, setNotes] = useState("");
   const [showPaymentDetails, setShowPaymentDetails] = useState(true);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   const gcashNumber = "09178833790";
   const gcashName = "Arthur Cedric Michael Jacob P. Caballes";
   const pageLink = "https://www.facebook.com/flamingassbyurotskie";
+
+  const deliveryRates = [
+    { area: "Cebu City", fee: 50 },
+    { area: "Mandaue / Lapu-Lapu", fee: 80 },
+    { area: "Outside Metro Cebu", fee: 120 },
+  ];
 
   const products = [
     {
@@ -22,6 +29,8 @@ export default function SmallBusinessEcommerceWebsite() {
       name: "Flaming Ass Carolina Reaper Hot Sauce",
       category: "HELLBREAKER",
       price: 350,
+      badge: "BEST SELLER",
+      heat: "EXTREME",
       image:
         "https://images.unsplash.com/photo-1472476443507-c7a5948772fc?auto=format&fit=crop&w=900&q=80",
       description:
@@ -32,6 +41,8 @@ export default function SmallBusinessEcommerceWebsite() {
       name: "Flaming Ass Habanero Hot Sauce",
       category: "INFERNO",
       price: 350,
+      badge: "HOT PICK",
+      heat: "HOT",
       image:
         "https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=900&q=80",
       description:
@@ -42,6 +53,8 @@ export default function SmallBusinessEcommerceWebsite() {
       name: "Flaming Ass Pineapple Habanero",
       category: "BLAZING HOT",
       price: 350,
+      badge: "LIMITED STOCK",
+      heat: "MEDIUM-HOT",
       image:
         "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=80",
       description:
@@ -52,6 +65,8 @@ export default function SmallBusinessEcommerceWebsite() {
       name: "Flaming Ass Green Jalapeño",
       category: "MILD",
       price: 300,
+      badge: "EASY START",
+      heat: "MILD",
       image:
         "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80",
       description:
@@ -59,16 +74,65 @@ export default function SmallBusinessEcommerceWebsite() {
     },
   ];
 
+  useEffect(() => {
+    const savedCart = localStorage.getItem("flaming-ass-cart");
+    const savedCustomer = localStorage.getItem("flaming-ass-customer");
+
+    if (savedCart) {
+      try {
+        setCartItems(JSON.parse(savedCart));
+      } catch {
+        localStorage.removeItem("flaming-ass-cart");
+      }
+    }
+
+    if (savedCustomer) {
+      try {
+        const parsed = JSON.parse(savedCustomer);
+        setCustomerName(parsed.customerName || "");
+        setContactNumber(parsed.contactNumber || "");
+        setAddress(parsed.address || "");
+        setPaymentMethod(parsed.paymentMethod || "GCash");
+        setReferenceNumber(parsed.referenceNumber || "");
+        setNotes(parsed.notes || "");
+      } catch {
+        localStorage.removeItem("flaming-ass-customer");
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("flaming-ass-cart", JSON.stringify(cartItems));
+  }, [cartItems]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "flaming-ass-customer",
+      JSON.stringify({
+        customerName,
+        contactNumber,
+        address,
+        paymentMethod,
+        referenceNumber,
+        notes,
+      })
+    );
+  }, [customerName, contactNumber, address, paymentMethod, referenceNumber, notes]);
+
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 500);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const addToCart = (product) => {
     setCartItems((current) => {
       const existing = current.find((item) => item.id === product.id);
-
       if (existing) {
         return current.map((item) =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-
       return [...current, { ...product, quantity: 1 }];
     });
   };
@@ -95,42 +159,57 @@ export default function SmallBusinessEcommerceWebsite() {
     setCartItems((current) => current.filter((item) => item.id !== productId));
   };
 
+  const clearCart = () => {
+    setCartItems([]);
+    setReferenceNumber("");
+    setNotes("");
+  };
+
   const totalCartItems = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.quantity, 0),
     [cartItems]
   );
 
-  const totalCartPrice = useMemo(
+  const subtotal = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
     [cartItems]
   );
+
+  const bundleDiscount = useMemo(() => {
+    const qualifyingBundles = Math.floor(totalCartItems / 3);
+    return qualifyingBundles * 150;
+  }, [totalCartItems]);
+
+  const totalCartPrice = useMemo(() => subtotal - bundleDiscount, [subtotal, bundleDiscount]);
+
+  const orderId = useMemo(() => {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+    const itemSeed = String(totalCartItems || 0).padStart(2, "0");
+    const priceSeed = String(totalCartPrice || 0).slice(-3).padStart(3, "0");
+    return `FA-${y}${m}${d}-${itemSeed}${priceSeed}`;
+  }, [totalCartItems, totalCartPrice]);
 
   const orderSummary = useMemo(() => {
     if (cartItems.length === 0) return "No items selected yet.";
 
     return cartItems
       .map(
-        (item) => `${item.quantity}x ${item.name} - ₱${item.price * item.quantity}`
+        (item) =>
+          `${item.quantity}x ${item.name} - ₱${item.price * item.quantity}`
       )
       .join("\n");
   }, [cartItems]);
 
   const orderMessage = useMemo(() => {
-    return `🔥 FLAMING ASS ORDER 🔥
-
-Items:
-${orderSummary}
-
-Total: ₱${totalCartPrice}
-
-Customer Name: ${customerName || "-"}
-Contact Number: ${contactNumber || "-"}
-Address: ${address || "-"}
-Payment Method: ${paymentMethod}
-Reference Number: ${referenceNumber || "-"}
-Notes: ${notes || "-"}`;
+    return `🔥 FLAMING ASS ORDER 🔥\n\nOrder ID: ${orderId}\n\nItems:\n${orderSummary}\n\nSubtotal: ₱${subtotal}\nBundle Discount: ₱${bundleDiscount}\nTotal: ₱${totalCartPrice}\n\nCustomer Name: ${customerName || "-"}\nContact Number: ${contactNumber || "-"}\nAddress: ${address || "-"}\nPayment Method: ${paymentMethod}\nReference Number: ${referenceNumber || "-"}\nNotes: ${notes || "-"}`;
   }, [
+    orderId,
     orderSummary,
+    subtotal,
+    bundleDiscount,
     totalCartPrice,
     customerName,
     contactNumber,
@@ -144,7 +223,7 @@ Notes: ${notes || "-"}`;
     try {
       await navigator.clipboard.writeText(orderMessage);
       alert("Order details copied. You can now paste it on the Facebook Page message.");
-    } catch (error) {
+    } catch {
       alert("Copy failed. Please copy the order manually from the preview.");
     }
   };
@@ -165,7 +244,7 @@ Notes: ${notes || "-"}`;
       alert(
         "Order details copied. Facebook Page will open next. Click Message and paste your order."
       );
-    } catch (error) {
+    } catch {
       alert(
         "Copy failed. Facebook Page will open, but you may need to copy the order preview manually."
       );
@@ -208,6 +287,9 @@ Notes: ${notes || "-"}`;
         <section className="relative overflow-hidden">
           <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-24">
             <div className="flex flex-col justify-center">
+              <span className="mb-4 inline-flex w-fit rounded-full border border-orange-500/20 bg-zinc-900 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-orange-300">
+                Small-batch heat for real spice lovers
+              </span>
               <h2 className="max-w-xl text-4xl font-black sm:text-5xl lg:text-6xl">
                 Real Heat. Real Flavor.
               </h2>
@@ -217,16 +299,38 @@ Notes: ${notes || "-"}`;
               </p>
 
               <p className="mt-5 text-zinc-300">
-                Premium small-batch hot sauce made for real spice lovers. From mild
-                flavor to extreme heat—choose your level.
+                Premium hot sauce made for serious cravings. Clean flavor, bold heat, and easy ordering for direct local sales.
               </p>
 
-              <a
-                href="#shop"
-                className="mt-6 w-fit rounded-2xl bg-orange-600 px-6 py-3 text-white"
-              >
-                Browse Sauces
-              </a>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <a
+                  href="#shop"
+                  className="w-fit rounded-2xl bg-orange-600 px-6 py-3 text-white"
+                >
+                  Browse Sauces
+                </a>
+                <a
+                  href="#cart"
+                  className="w-fit rounded-2xl border border-orange-500/20 px-6 py-3 text-zinc-100 hover:bg-zinc-900"
+                >
+                  Go to Checkout
+                </a>
+              </div>
+
+              <div className="mt-8 grid grid-cols-3 gap-3">
+                <div className="rounded-2xl border border-orange-500/20 bg-zinc-900 p-4">
+                  <p className="text-2xl font-black">4</p>
+                  <p className="text-sm text-zinc-400">Flavor Variants</p>
+                </div>
+                <div className="rounded-2xl border border-orange-500/20 bg-zinc-900 p-4">
+                  <p className="text-2xl font-black">₱150</p>
+                  <p className="text-sm text-zinc-400">Bundle Savings</p>
+                </div>
+                <div className="rounded-2xl border border-orange-500/20 bg-zinc-900 p-4">
+                  <p className="text-2xl font-black">GCash</p>
+                  <p className="text-sm text-zinc-400">Fast Payment</p>
+                </div>
+              </div>
             </div>
 
             <div className="relative">
@@ -246,13 +350,46 @@ Notes: ${notes || "-"}`;
           </div>
         </section>
 
+        <section className="mx-auto max-w-7xl px-4 pb-4">
+          <div className="rounded-[2rem] border border-orange-500/20 bg-zinc-900 p-6">
+            <div className="grid gap-4 md:grid-cols-3">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-300">
+                  Bundle Promo
+                </p>
+                <h3 className="mt-2 text-2xl font-black">Any 3 Bottles = Save ₱150</h3>
+                <p className="mt-2 text-sm text-zinc-400">
+                  Discount is applied automatically in the cart.
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-300">
+                  Delivery
+                </p>
+                <div className="mt-2 space-y-1 text-sm text-zinc-300">
+                  {deliveryRates.map((rate) => (
+                    <p key={rate.area}>{rate.area} — ₱{rate.fee}</p>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-300">
+                  Processing Time
+                </p>
+                <p className="mt-2 text-sm text-zinc-300">
+                  Same day or next day confirmation depending on order volume and delivery area.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="shop" className="mx-auto max-w-7xl px-4 py-14">
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
               <h3 className="text-3xl font-black">🔥 Featured Hot Sauces</h3>
               <p className="mt-2 text-sm text-zinc-400">
-                Add any flavor to cart. Clicking the same item again increases its
-                quantity.
+                Add any flavor to cart. Clicking the same item again increases its quantity.
               </p>
             </div>
           </div>
@@ -266,16 +403,24 @@ Notes: ${notes || "-"}`;
                   key={product.id}
                   className="rounded-[2rem] border border-orange-500/20 bg-zinc-900 p-4"
                 >
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="h-64 w-full rounded-xl object-cover"
-                  />
+                  <div className="relative">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="h-64 w-full rounded-xl object-cover"
+                    />
+                    <span className="absolute left-3 top-3 rounded-full bg-zinc-950/90 px-3 py-1 text-[10px] font-semibold tracking-[0.2em] text-orange-300">
+                      {product.badge}
+                    </span>
+                  </div>
 
                   <div className="mt-3 flex items-start justify-between gap-3">
-                    <p className="text-sm tracking-[0.2em] text-orange-300">
-                      {product.category}
-                    </p>
+                    <div>
+                      <p className="text-sm tracking-[0.2em] text-orange-300">
+                        {product.category}
+                      </p>
+                      <p className="mt-1 text-xs text-zinc-500">Heat Level: {product.heat}</p>
+                    </div>
                     <p className="text-lg font-black">₱{product.price}</p>
                   </div>
 
@@ -298,7 +443,65 @@ Notes: ${notes || "-"}`;
           </div>
         </section>
 
-        <section id="cart" className="mx-auto max-w-7xl px-4 pb-14">
+        <section className="mx-auto max-w-7xl px-4 pb-10">
+          <div className="grid gap-4 md:grid-cols-3">
+            {[
+              {
+                title: "Fast Direct Ordering",
+                text: "Add to cart, fill in your details, copy the order, and message the Facebook Page in minutes.",
+              },
+              {
+                title: "GCash Ready",
+                text: "Customers can pay instantly through GCash and send the reference number with the order.",
+              },
+              {
+                title: "Built for Mobile",
+                text: "Designed to feel simple, fast, and clean for phone users where most orders happen.",
+              },
+            ].map((feature) => (
+              <div
+                key={feature.title}
+                className="rounded-[2rem] border border-orange-500/20 bg-zinc-900 p-6"
+              >
+                <h4 className="text-lg font-bold">{feature.title}</h4>
+                <p className="mt-2 text-sm text-zinc-400">{feature.text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-7xl px-4 pb-10">
+          <div className="rounded-[2rem] border border-orange-500/20 bg-zinc-900 p-6">
+            <h3 className="text-2xl font-black">What Customers Say</h3>
+            <div className="mt-5 grid gap-4 md:grid-cols-3">
+              {[
+                {
+                  name: "Cebu Customer",
+                  text: "Grabe ka anghang pero lami kaayo. The Pineapple Habanero is my favorite. 🔥",
+                },
+                {
+                  name: "Spice Lover",
+                  text: "The Carolina Reaper is no joke. Clean flavor first, then pure pain after.",
+                },
+                {
+                  name: "Repeat Buyer",
+                  text: "Minimal but smooth ordering process. Easy to message and order directly.",
+                },
+              ].map((review) => (
+                <div
+                  key={review.name}
+                  className="rounded-[1.5rem] border border-orange-500/20 bg-zinc-950 p-5"
+                >
+                  <p className="text-orange-300">★★★★★</p>
+                  <p className="mt-3 text-sm text-zinc-300">“{review.text}”</p>
+                  <p className="mt-4 text-sm font-semibold text-zinc-400">— {review.name}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="cart" className="mx-auto max-w-7xl px-4 pb-20">
           <div className="rounded-[2rem] border border-orange-500/20 bg-zinc-900 p-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
@@ -306,10 +509,13 @@ Notes: ${notes || "-"}`;
                 <p className="text-sm text-zinc-400">
                   Adjust quantities, remove items, and complete your order below.
                 </p>
+                <p className="mt-2 text-sm text-orange-300">Order ID: {orderId}</p>
               </div>
               <div className="text-left sm:text-right">
                 <p className="text-sm text-zinc-400">Items: {totalCartItems}</p>
-                <p className="text-xl font-black">Total: ₱{totalCartPrice}</p>
+                <p className="text-lg text-zinc-400">Subtotal: ₱{subtotal}</p>
+                <p className="text-lg text-orange-300">Bundle Discount: ₱{bundleDiscount}</p>
+                <p className="text-2xl font-black">Total: ₱{totalCartPrice}</p>
               </div>
             </div>
 
@@ -365,6 +571,21 @@ Notes: ${notes || "-"}`;
               )}
             </div>
 
+            <div className="mt-5 flex flex-wrap gap-3">
+              <button
+                onClick={clearCart}
+                className="rounded-2xl border border-red-500/30 px-5 py-3 text-sm font-semibold text-red-300 hover:bg-red-500/10"
+              >
+                Clear Cart
+              </button>
+              <a
+                href="#shop"
+                className="rounded-2xl border border-orange-500/20 px-5 py-3 text-sm font-semibold text-zinc-100 hover:bg-zinc-950"
+              >
+                Add More Items
+              </a>
+            </div>
+
             <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
               <div className="rounded-[1.5rem] border border-orange-500/20 bg-zinc-950 p-5">
                 <div className="flex items-center justify-between gap-3">
@@ -393,8 +614,7 @@ Notes: ${notes || "-"}`;
                         Account Name: {gcashName}
                       </p>
                       <p className="mt-3 text-sm text-zinc-300">
-                        Send payment first, then place your reference number in the
-                        form before sending your order.
+                        Send payment first, then place your reference number in the form before sending your order.
                       </p>
                     </div>
 
@@ -501,7 +721,38 @@ Notes: ${notes || "-"}`;
         </section>
       </main>
 
-      <footer className="py-6 text-center text-zinc-500">
+      <a
+        href="#cart"
+        className="fixed bottom-5 right-5 z-40 rounded-full bg-orange-600 px-5 py-3 text-sm font-semibold text-white shadow-2xl hover:opacity-90"
+      >
+        🔥 Order Now ({totalCartItems})
+      </a>
+
+      {showScrollTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="fixed bottom-20 right-5 z-40 rounded-full border border-orange-500/20 bg-zinc-900 px-4 py-3 text-sm font-semibold text-zinc-100 shadow-2xl hover:bg-zinc-800"
+        >
+          ↑ Top
+        </button>
+      )}
+
+      <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-orange-500/20 bg-zinc-950/95 px-4 py-3 backdrop-blur md:hidden">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+          <div>
+            <p className="text-xs text-zinc-400">{totalCartItems} item(s)</p>
+            <p className="font-black">₱{totalCartPrice}</p>
+          </div>
+          <a
+            href="#cart"
+            className="rounded-2xl bg-orange-600 px-5 py-3 text-sm font-semibold text-white"
+          >
+            Checkout
+          </a>
+        </div>
+      </div>
+
+      <footer className="py-6 pb-24 text-center text-zinc-500 md:pb-6">
         © 2026 FLAMING ASS BY UROTSKIE
       </footer>
     </div>
