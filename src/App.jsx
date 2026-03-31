@@ -14,8 +14,7 @@ export default function SmallBusinessEcommerceWebsite() {
 
   const gcashNumber = "09178833790";
   const gcashName = "Arthur Cedric Michael Jacob P. Caballes";
-  const messengerLink =
-  "https://m.me/flamingassbyurotskie";
+  const pageLink = "https://www.facebook.com/flamingassbyurotskie";
 
   const products = [
     {
@@ -63,11 +62,13 @@ export default function SmallBusinessEcommerceWebsite() {
   const addToCart = (product) => {
     setCartItems((current) => {
       const existing = current.find((item) => item.id === product.id);
+
       if (existing) {
         return current.map((item) =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
+
       return [...current, { ...product, quantity: 1 }];
     });
   };
@@ -109,14 +110,25 @@ export default function SmallBusinessEcommerceWebsite() {
 
     return cartItems
       .map(
-        (item) =>
-          `${item.quantity}x ${item.name} - ₱${item.price * item.quantity}`
+        (item) => `${item.quantity}x ${item.name} - ₱${item.price * item.quantity}`
       )
       .join("\n");
   }, [cartItems]);
 
   const orderMessage = useMemo(() => {
-    return `🔥 FLAMING ASS ORDER 🔥\n\nItems:\n${orderSummary}\n\nTotal: ₱${totalCartPrice}\n\nCustomer Name: ${customerName || "-"}\nContact Number: ${contactNumber || "-"}\nAddress: ${address || "-"}\nPayment Method: ${paymentMethod}\nReference Number: ${referenceNumber || "-"}\nNotes: ${notes || "-"}`;
+    return `🔥 FLAMING ASS ORDER 🔥
+
+Items:
+${orderSummary}
+
+Total: ₱${totalCartPrice}
+
+Customer Name: ${customerName || "-"}
+Contact Number: ${contactNumber || "-"}
+Address: ${address || "-"}
+Payment Method: ${paymentMethod}
+Reference Number: ${referenceNumber || "-"}
+Notes: ${notes || "-"}`;
   }, [
     orderSummary,
     totalCartPrice,
@@ -131,13 +143,13 @@ export default function SmallBusinessEcommerceWebsite() {
   const copyOrderMessage = async () => {
     try {
       await navigator.clipboard.writeText(orderMessage);
-      alert("Order details copied. You can now paste it in Messenger.");
+      alert("Order details copied. You can now paste it on the Facebook Page message.");
     } catch (error) {
-      alert("Copy failed. Please copy the message manually from the preview.");
+      alert("Copy failed. Please copy the order manually from the preview.");
     }
   };
 
-  const handleMessengerCheckout = () => {
+  const handleMessengerCheckout = async () => {
     if (cartItems.length === 0) {
       alert("Your cart is empty.");
       return;
@@ -148,8 +160,18 @@ export default function SmallBusinessEcommerceWebsite() {
       return;
     }
 
-    const encodedMessage = encodeURIComponent(orderMessage);
-    window.open(`${messengerLink}&text=${encodedMessage}`, "_blank");
+    try {
+      await navigator.clipboard.writeText(orderMessage);
+      alert(
+        "Order details copied. Facebook Page will open next. Click Message and paste your order."
+      );
+    } catch (error) {
+      alert(
+        "Copy failed. Facebook Page will open, but you may need to copy the order preview manually."
+      );
+    }
+
+    window.open(pageLink, "_blank");
   };
 
   return (
@@ -171,9 +193,12 @@ export default function SmallBusinessEcommerceWebsite() {
           </div>
 
           <div className="text-right">
-            <button className="rounded-2xl bg-orange-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:opacity-90">
+            <a
+              href="#cart"
+              className="inline-block rounded-2xl bg-orange-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:opacity-90"
+            >
               Cart ({totalCartItems})
-            </button>
+            </a>
             <p className="mt-1 text-xs text-zinc-400">Total: ₱{totalCartPrice}</p>
           </div>
         </div>
@@ -192,7 +217,8 @@ export default function SmallBusinessEcommerceWebsite() {
               </p>
 
               <p className="mt-5 text-zinc-300">
-                Premium small-batch hot sauce made for real spice lovers. From mild flavor to extreme heat—choose your level.
+                Premium small-batch hot sauce made for real spice lovers. From mild
+                flavor to extreme heat—choose your level.
               </p>
 
               <a
@@ -225,7 +251,8 @@ export default function SmallBusinessEcommerceWebsite() {
             <div>
               <h3 className="text-3xl font-black">🔥 Featured Hot Sauces</h3>
               <p className="mt-2 text-sm text-zinc-400">
-                Add any flavor to cart. Clicking the same item again increases its quantity.
+                Add any flavor to cart. Clicking the same item again increases its
+                quantity.
               </p>
             </div>
           </div>
@@ -246,11 +273,15 @@ export default function SmallBusinessEcommerceWebsite() {
                   />
 
                   <div className="mt-3 flex items-start justify-between gap-3">
-                    <p className="text-sm tracking-[0.2em] text-orange-300">{product.category}</p>
+                    <p className="text-sm tracking-[0.2em] text-orange-300">
+                      {product.category}
+                    </p>
                     <p className="text-lg font-black">₱{product.price}</p>
                   </div>
 
-                  <h4 className="mt-2 text-xl font-bold leading-tight">{product.name}</h4>
+                  <h4 className="mt-2 text-xl font-bold leading-tight">
+                    {product.name}
+                  </h4>
                   <p className="mt-3 min-h-[112px] text-sm text-zinc-300">
                     {product.description}
                   </p>
@@ -267,7 +298,7 @@ export default function SmallBusinessEcommerceWebsite() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-4 pb-14">
+        <section id="cart" className="mx-auto max-w-7xl px-4 pb-14">
           <div className="rounded-[2rem] border border-orange-500/20 bg-zinc-900 p-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
@@ -358,9 +389,12 @@ export default function SmallBusinessEcommerceWebsite() {
                         GCash
                       </p>
                       <p className="mt-2 text-lg font-bold">{gcashNumber}</p>
-                      <p className="mt-1 text-sm text-zinc-400">Account Name: {gcashName}</p>
+                      <p className="mt-1 text-sm text-zinc-400">
+                        Account Name: {gcashName}
+                      </p>
                       <p className="mt-3 text-sm text-zinc-300">
-                        Send payment first, then place your reference number in the form before sending your order.
+                        Send payment first, then place your reference number in the
+                        form before sending your order.
                       </p>
                     </div>
 
@@ -435,7 +469,7 @@ export default function SmallBusinessEcommerceWebsite() {
                 <div>
                   <h5 className="text-lg font-bold">Order Preview</h5>
                   <p className="text-sm text-zinc-400">
-                    Review before sending to Messenger.
+                    Review before sending to Facebook Page.
                   </p>
                 </div>
                 <div className="text-left sm:text-right">
@@ -459,7 +493,7 @@ export default function SmallBusinessEcommerceWebsite() {
                   onClick={handleMessengerCheckout}
                   className="rounded-2xl bg-orange-600 px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
                 >
-                  Send Order via Messenger
+                  Send Order via Facebook Page
                 </button>
               </div>
             </div>
