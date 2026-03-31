@@ -22,7 +22,6 @@ export default function SmallBusinessEcommerceWebsite() {
 
   const gcashNumber = "09178833790";
   const gcashName = "Arthur Cedric Michael Jacob P. Caballes";
-  const pageLink = "https://www.facebook.com/flamingassbyurotskie";
 
   const products = [
     {
@@ -223,13 +222,13 @@ Notes: ${notes || "-"}`;
   const copyOrderMessage = async () => {
     try {
       await navigator.clipboard.writeText(orderMessage);
-      alert("Order details copied. You can now paste it on the Facebook Page message.");
+      alert("Order details copied.");
     } catch {
       alert("Copy failed. Please copy the order manually from the preview.");
     }
   };
 
-  const handleMessengerCheckout = async () => {
+  const handleSupabaseCheckout = async () => {
     if (cartItems.length === 0) {
       alert("Your cart is empty.");
       return;
@@ -264,40 +263,19 @@ Notes: ${notes || "-"}`;
 
     if (error) {
       alert("Order saving failed: " + error.message);
-      console.error(error);
       return;
     }
 
     try {
       await navigator.clipboard.writeText(orderMessage);
-      alert(
-        "Order saved successfully. Facebook Page will open next. Click Message and paste your order."
-      );
+      alert("Order saved successfully in Supabase and copied.");
     } catch {
-      alert(
-        "Order saved successfully. Facebook Page will open next, but you may need to copy the order preview manually."
-      );
+      alert("Order saved successfully in Supabase.");
     }
-
-    window.open(pageLink, "_blank");
   };
 
   const submitFeedback = () => {
-    const message = `🔥 FLAMING ASS FEEDBACK 🔥
-
-Rating: ${feedbackRating}
-Feedback: ${feedbackText || "-"}`;
-
-    navigator.clipboard
-      .writeText(message)
-      .then(() => {
-        alert("Feedback copied. The Facebook Page will open next. Click Message and paste your feedback.");
-        window.open(pageLink, "_blank");
-      })
-      .catch(() => {
-        alert("Please copy your feedback manually and send it through the Facebook Page.");
-        window.open(pageLink, "_blank");
-      });
+    alert("Feedback form is currently local only. Admin approval can be added later.");
   };
 
   return (
@@ -347,7 +325,8 @@ Feedback: ${feedbackText || "-"}`;
               </p>
 
               <p className="mt-5 text-zinc-300">
-                Premium hot sauce made for serious cravings. Clean flavor, bold heat, and easy ordering for direct local sales.
+                Premium hot sauce made for serious cravings. Clean flavor, bold heat,
+                and easy ordering for direct local sales.
               </p>
 
               <div className="mt-6 flex flex-wrap gap-3">
@@ -375,8 +354,8 @@ Feedback: ${feedbackText || "-"}`;
                   <p className="text-sm text-zinc-400">Fast Payment</p>
                 </div>
                 <div className="rounded-2xl border border-orange-500/20 bg-zinc-900 p-4">
-                  <p className="text-2xl font-black">Direct</p>
-                  <p className="text-sm text-zinc-400">Page Ordering</p>
+                  <p className="text-2xl font-black">Saved</p>
+                  <p className="text-sm text-zinc-400">to Supabase</p>
                 </div>
               </div>
             </div>
@@ -411,8 +390,8 @@ Feedback: ${feedbackText || "-"}`;
                 www.facebook.com/flamingassbyurotskie
               </p>
               <p>
-                <span className="font-semibold">Location:</span> St. Anthony's Village
-                Hiway-77 Talamban Cebu City
+                <span className="font-semibold">Location:</span> St. Anthony&apos;s
+                Village Hiway-77 Talamban Cebu City
               </p>
             </div>
           </div>
@@ -423,7 +402,8 @@ Feedback: ${feedbackText || "-"}`;
             <div>
               <h3 className="text-3xl font-black">🔥 Featured Hot Sauces</h3>
               <p className="mt-2 text-sm text-zinc-400">
-                Add any flavor to cart. Clicking the same item again increases its quantity.
+                Add any flavor to cart. Clicking the same item again increases its
+                quantity.
               </p>
             </div>
           </div>
@@ -484,7 +464,7 @@ Feedback: ${feedbackText || "-"}`;
             {[
               {
                 title: "Fast Direct Ordering",
-                text: "Add to cart, fill in your details, copy the order, and message the Facebook Page in minutes.",
+                text: "Add to cart, fill in your details, and save the order directly to the database.",
               },
               {
                 title: "GCash Ready",
@@ -569,7 +549,7 @@ Feedback: ${feedbackText || "-"}`;
                 </div>
 
                 <p className="mt-3 text-xs text-zinc-500">
-                  Feedback will be copied, then your Facebook Page will open so the buyer can paste and send it.
+                  Feedback moderation can be added later through Supabase admin tools.
                 </p>
               </div>
             </div>
@@ -582,7 +562,7 @@ Feedback: ${feedbackText || "-"}`;
               <div>
                 <h4 className="text-2xl font-black">Cart Summary</h4>
                 <p className="text-sm text-zinc-400">
-                  Adjust quantities, remove items, and complete your order below.
+                  Adjust quantities, remove items, and save your order below.
                 </p>
                 <p className="mt-2 text-sm text-orange-300">Order ID: {orderId}</p>
               </div>
@@ -689,7 +669,7 @@ Feedback: ${feedbackText || "-"}`;
                       <p className="mt-3 text-sm text-zinc-300">
                         Send payment via GCash, then:
                         <br />• Enter your reference number
-                        <br />• Upload/send screenshot in Messenger after checkout
+                        <br />• Keep your screenshot for admin verification
                       </p>
                     </div>
 
@@ -752,7 +732,7 @@ Feedback: ${feedbackText || "-"}`;
                     rows={3}
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Notes / mention that you will send screenshot"
+                    placeholder="Notes / screenshot note"
                     className="w-full rounded-2xl border border-orange-400/30 bg-zinc-900 px-4 py-3 outline-none transition focus:border-orange-400"
                   />
                 </div>
@@ -764,7 +744,7 @@ Feedback: ${feedbackText || "-"}`;
                 <div>
                   <h5 className="text-lg font-bold">Order Preview</h5>
                   <p className="text-sm text-zinc-400">
-                    Review before sending to Facebook Page.
+                    Review before saving to Supabase.
                   </p>
                 </div>
                 <div className="text-left sm:text-right">
@@ -785,10 +765,10 @@ Feedback: ${feedbackText || "-"}`;
                   Copy Order Details
                 </button>
                 <button
-                  onClick={handleMessengerCheckout}
+                  onClick={handleSupabaseCheckout}
                   className="rounded-2xl bg-orange-600 px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
                 >
-                  Send Order via Facebook Page
+                  Save Order to Supabase
                 </button>
               </div>
             </div>
@@ -833,4 +813,3 @@ Feedback: ${feedbackText || "-"}`;
     </div>
   );
 }
-
