@@ -1,9 +1,21 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import logo from "./assets/logo.png";
 import banner from "./assets/banner.png";
 
 export default function SmallBusinessEcommerceWebsite() {
   const [cartItems, setCartItems] = useState([]);
+  const [customerName, setCustomerName] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
+  const [address, setAddress] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("GCash");
+  const [referenceNumber, setReferenceNumber] = useState("");
+  const [notes, setNotes] = useState("");
+  const [showPaymentDetails, setShowPaymentDetails] = useState(true);
+
+  const gcashNumber = "09178833790";
+  const gcashName = "Arthur Cedric Michael Jacob P. Caballes";
+  const messengerLink =
+    "https://business.facebook.com/latest/inbox/messenger?asset_id=1096704086852722";
 
   const products = [
     {
@@ -51,13 +63,11 @@ export default function SmallBusinessEcommerceWebsite() {
   const addToCart = (product) => {
     setCartItems((current) => {
       const existing = current.find((item) => item.id === product.id);
-
       if (existing) {
         return current.map((item) =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-
       return [...current, { ...product, quantity: 1 }];
     });
   };
@@ -84,29 +94,79 @@ export default function SmallBusinessEcommerceWebsite() {
     setCartItems((current) => current.filter((item) => item.id !== productId));
   };
 
-  const totalCartItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const totalCartPrice = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
+  const totalCartItems = useMemo(
+    () => cartItems.reduce((sum, item) => sum + item.quantity, 0),
+    [cartItems]
   );
+
+  const totalCartPrice = useMemo(
+    () => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [cartItems]
+  );
+
+  const orderSummary = useMemo(() => {
+    if (cartItems.length === 0) return "No items selected yet.";
+
+    return cartItems
+      .map(
+        (item) =>
+          `${item.quantity}x ${item.name} - ₱${item.price * item.quantity}`
+      )
+      .join("\n");
+  }, [cartItems]);
+
+  const orderMessage = useMemo(() => {
+    return `🔥 FLAMING ASS ORDER 🔥\n\nItems:\n${orderSummary}\n\nTotal: ₱${totalCartPrice}\n\nCustomer Name: ${customerName || "-"}\nContact Number: ${contactNumber || "-"}\nAddress: ${address || "-"}\nPayment Method: ${paymentMethod}\nReference Number: ${referenceNumber || "-"}\nNotes: ${notes || "-"}`;
+  }, [
+    orderSummary,
+    totalCartPrice,
+    customerName,
+    contactNumber,
+    address,
+    paymentMethod,
+    referenceNumber,
+    notes,
+  ]);
+
+  const copyOrderMessage = async () => {
+    try {
+      await navigator.clipboard.writeText(orderMessage);
+      alert("Order details copied. You can now paste it in Messenger.");
+    } catch (error) {
+      alert("Copy failed. Please copy the message manually from the preview.");
+    }
+  };
+
+  const handleMessengerCheckout = () => {
+    if (cartItems.length === 0) {
+      alert("Your cart is empty.");
+      return;
+    }
+
+    if (!customerName || !contactNumber || !address) {
+      alert("Please fill in your name, contact number, and address first.");
+      return;
+    }
+
+    const encodedMessage = encodeURIComponent(orderMessage);
+    window.open(`${messengerLink}&text=${encodedMessage}`, "_blank");
+  };
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <header className="sticky top-0 z-50 border-b border-orange-500/20 bg-zinc-950/90 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8 gap-4">
-          <div>
-            <div className="flex items-center gap-3">
-              <img
-                src={logo}
-                alt="Flaming Ass logo"
-                className="h-12 w-12 rounded-full object-cover border border-orange-500/30"
-              />
-              <div>
-                <h1 className="text-xl font-black tracking-tight sm:text-2xl">
-                  FLAMING ASS
-                </h1>
-                <p className="text-xs text-zinc-400 sm:text-sm">BY UROTSKIE</p>
-              </div>
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <img
+              src={logo}
+              alt="Flaming Ass logo"
+              className="h-12 w-12 rounded-full border border-orange-500/30 object-cover"
+            />
+            <div>
+              <h1 className="text-xl font-black tracking-tight sm:text-2xl">
+                FLAMING ASS
+              </h1>
+              <p className="text-xs text-zinc-400 sm:text-sm">BY UROTSKIE</p>
             </div>
           </div>
 
@@ -144,7 +204,7 @@ export default function SmallBusinessEcommerceWebsite() {
             </div>
 
             <div className="relative">
-              <div className="rounded-[2rem] border border-orange-500/20 bg-zinc-900 p-4 shadow-2xl relative overflow-hidden">
+              <div className="relative overflow-hidden rounded-[2rem] border border-orange-500/20 bg-zinc-900 p-4 shadow-2xl">
                 <img
                   src={banner}
                   alt="Hot sauce"
@@ -153,7 +213,7 @@ export default function SmallBusinessEcommerceWebsite() {
                 <img
                   src={logo}
                   alt="watermark"
-                  className="absolute right-5 bottom-5 w-24 opacity-20"
+                  className="absolute bottom-5 right-5 w-24 opacity-20"
                 />
               </div>
             </div>
@@ -182,7 +242,7 @@ export default function SmallBusinessEcommerceWebsite() {
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="h-64 w-full object-cover rounded-xl"
+                    className="h-64 w-full rounded-xl object-cover"
                   />
 
                   <div className="mt-3 flex items-start justify-between gap-3">
@@ -190,14 +250,14 @@ export default function SmallBusinessEcommerceWebsite() {
                     <p className="text-lg font-black">₱{product.price}</p>
                   </div>
 
-                  <h4 className="mt-2 font-bold text-xl leading-tight">{product.name}</h4>
-                  <p className="text-sm text-zinc-300 mt-3 min-h-[112px]">
+                  <h4 className="mt-2 text-xl font-bold leading-tight">{product.name}</h4>
+                  <p className="mt-3 min-h-[112px] text-sm text-zinc-300">
                     {product.description}
                   </p>
 
                   <button
                     onClick={() => addToCart(product)}
-                    className="mt-4 w-full bg-orange-600 py-3 rounded-xl font-semibold transition hover:opacity-90"
+                    className="mt-4 w-full rounded-xl bg-orange-600 py-3 font-semibold transition hover:opacity-90"
                   >
                     {inCart ? `Add More (${inCart.quantity})` : "Add to Cart"}
                   </button>
@@ -213,7 +273,7 @@ export default function SmallBusinessEcommerceWebsite() {
               <div>
                 <h4 className="text-2xl font-black">Cart Summary</h4>
                 <p className="text-sm text-zinc-400">
-                  Quick preview of all selected sauces.
+                  Adjust quantities, remove items, and complete your order below.
                 </p>
               </div>
               <div className="text-left sm:text-right">
@@ -274,12 +334,108 @@ export default function SmallBusinessEcommerceWebsite() {
               )}
             </div>
 
+            <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
+              <div className="rounded-[1.5rem] border border-orange-500/20 bg-zinc-950 p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <h5 className="text-lg font-bold">Payment Details</h5>
+                    <p className="text-sm text-zinc-400">
+                      Use GCash for payment. Bank transfer is still under construction.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowPaymentDetails((value) => !value)}
+                    className="rounded-xl border border-orange-500/20 px-3 py-2 text-sm font-semibold hover:bg-zinc-900"
+                  >
+                    {showPaymentDetails ? "Hide" : "Show"}
+                  </button>
+                </div>
+
+                {showPaymentDetails && (
+                  <div className="mt-5 space-y-4">
+                    <div className="rounded-xl border border-orange-500/20 bg-zinc-900 p-4">
+                      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-300">
+                        GCash
+                      </p>
+                      <p className="mt-2 text-lg font-bold">{gcashNumber}</p>
+                      <p className="mt-1 text-sm text-zinc-400">Account Name: {gcashName}</p>
+                      <p className="mt-3 text-sm text-zinc-300">
+                        Send payment first, then place your reference number in the form before sending your order.
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl border border-orange-500/20 bg-zinc-900 p-4">
+                      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-300">
+                        Bank Transfer
+                      </p>
+                      <p className="mt-2 text-sm text-zinc-300">
+                        Under construction. Available soon.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="rounded-[1.5rem] border border-orange-500/20 bg-zinc-950 p-5">
+                <h5 className="text-lg font-bold">Customer Details</h5>
+                <p className="mt-1 text-sm text-zinc-400">
+                  Fill this out so your order can be processed correctly.
+                </p>
+
+                <div className="mt-5 space-y-4">
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="Full Name"
+                    className="w-full rounded-2xl border border-orange-400/30 bg-zinc-900 px-4 py-3 outline-none transition focus:border-orange-400"
+                  />
+                  <input
+                    type="text"
+                    value={contactNumber}
+                    onChange={(e) => setContactNumber(e.target.value)}
+                    placeholder="Contact Number"
+                    className="w-full rounded-2xl border border-orange-400/30 bg-zinc-900 px-4 py-3 outline-none transition focus:border-orange-400"
+                  />
+                  <textarea
+                    rows={3}
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="Complete Address"
+                    className="w-full rounded-2xl border border-orange-400/30 bg-zinc-900 px-4 py-3 outline-none transition focus:border-orange-400"
+                  />
+                  <select
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-full rounded-2xl border border-orange-400/30 bg-zinc-900 px-4 py-3 outline-none transition focus:border-orange-400"
+                  >
+                    <option>GCash</option>
+                    <option>Bank Transfer</option>
+                  </select>
+                  <input
+                    type="text"
+                    value={referenceNumber}
+                    onChange={(e) => setReferenceNumber(e.target.value)}
+                    placeholder="Reference Number / Last 4 Digits"
+                    className="w-full rounded-2xl border border-orange-400/30 bg-zinc-900 px-4 py-3 outline-none transition focus:border-orange-400"
+                  />
+                  <textarea
+                    rows={3}
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Notes (optional)"
+                    className="w-full rounded-2xl border border-orange-400/30 bg-zinc-900 px-4 py-3 outline-none transition focus:border-orange-400"
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="mt-6 rounded-[1.5rem] border border-orange-500/20 bg-zinc-950 p-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h5 className="text-lg font-bold">Checkout Options</h5>
+                  <h5 className="text-lg font-bold">Order Preview</h5>
                   <p className="text-sm text-zinc-400">
-                    Simple local checkout for direct orders.
+                    Review before sending to Messenger.
                   </p>
                 </div>
                 <div className="text-left sm:text-right">
@@ -288,42 +444,22 @@ export default function SmallBusinessEcommerceWebsite() {
                 </div>
               </div>
 
-              <div className="mt-5 grid gap-4 md:grid-cols-3">
-                <div className="rounded-xl border border-orange-500/20 bg-zinc-900 p-4">
-                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-300">GCash</p>
-                  <p className="mt-2 font-semibold">09XX-XXX-XXXX</p>
-                  <p className="mt-1 text-sm text-zinc-400">Account Name: UROTSKIE</p>
-                  <p className="mt-3 text-sm text-zinc-300">
-                    Send payment, then message your proof of payment with your order details.
-                  </p>
-                </div>
-
-                <div className="rounded-xl border border-orange-500/20 bg-zinc-900 p-4">
-                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-300">Bank Transfer</p>
-                  <p className="mt-2 text-sm text-zinc-300">
-                    Under construction. Will be available soon.
-                  </p>
-                </div>
-
-                <div className="rounded-xl border border-orange-500/20 bg-zinc-900 p-4">
-                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-300">Direct Message</p>
-                  <p className="mt-2 text-sm text-zinc-300">
-                    Best for fast ordering. Send your selected items, quantity, full name, address, and preferred payment method.
-                  </p>
-                </div>
-              </div>
+              <pre className="mt-5 whitespace-pre-wrap rounded-xl border border-orange-500/20 bg-zinc-900 p-4 text-sm text-zinc-200">
+                {orderMessage}
+              </pre>
 
               <div className="mt-5 flex flex-wrap gap-3">
-                <a
-                  href="https://m.me/flamingassbyurotskie"
-                  target="_blank"
-                  rel="noreferrer"
+                <button
+                  onClick={copyOrderMessage}
+                  className="rounded-2xl border border-orange-500/20 px-5 py-3 text-sm font-semibold text-zinc-100 hover:bg-zinc-900"
+                >
+                  Copy Order Details
+                </button>
+                <button
+                  onClick={handleMessengerCheckout}
                   className="rounded-2xl bg-orange-600 px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
                 >
-                  Message to Order
-                </a>
-                <button className="rounded-2xl border border-orange-500/20 px-5 py-3 text-sm font-semibold text-zinc-100 hover:bg-zinc-900">
-                  View GCash Details
+                  Send Order via Messenger
                 </button>
               </div>
             </div>
@@ -331,7 +467,7 @@ export default function SmallBusinessEcommerceWebsite() {
         </section>
       </main>
 
-      <footer className="text-center text-zinc-500 py-6">
+      <footer className="py-6 text-center text-zinc-500">
         © 2026 FLAMING ASS BY UROTSKIE
       </footer>
     </div>
